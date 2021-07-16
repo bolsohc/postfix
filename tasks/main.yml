@@ -1,0 +1,27 @@
+---
+- name: ensure postfix and mailx are installed
+  yum: name={{ item }} state=installed
+  with_items:
+    - postfix
+    - mailx
+
+- name: Insert stuff at the end of the postfix file
+  lineinfile: dest=/etc/postfix/main.cf line="{{ item }}" backup=yes insertafter=EOF create=no state=present
+  with_items:
+    - 'myhostname = {{ansible_fqdn}}'
+    - 'mydomain = {{postfix_regions[dc_to_region[ansible_local.datacenter.location]]["mydomain"]}}'
+    - 'relayhost = {{postfix_regions[dc_to_region[ansible_local.datacenter.location]]["relayhost"]}}'
+    - 'alias_maps = hash:/etc/aliases, nis:mail.aliases'
+  notify: restart postfix service
+  when: (dc_to_region[ansible_local.datacenter.location] is defined) and (not (ansible_fqdn.lower().endswith("domain.com")))
+
+- name: Insert stuff at the end of the postfix file
+  lineinfile: dest=/etc/postfix/main.cf line="{{ item }}" backup=yes insertafter=EOF create=no state=present
+  with_items:
+    - 'myhostname = {{ ansible_fqdn }}'
+    - 'mydomain = DOMAIN.COM'
+    - 'relayhost = mailhost.domain.com'
+    - 'alias_maps = hash:/etc/aliases, nis:mail.aliases'
+  notify: restart postfix service
+  when: ansible_fqdn.lower().endswith("domain.com")
+

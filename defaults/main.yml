@@ -1,0 +1,18 @@
+---
+postfix_regions:
+  AP:
+    mydomain: 
+    relayhost: 
+  CA:
+    mydomain: 
+    relayhost: 
+  US:
+    mydomain: 
+    relayhost:
+
+dc_to_region:
+  Boston: "US"
+  Chicago: "US"
+  Toronto: "CA"
+  Sydney: "AP"
+  LA: "US"
